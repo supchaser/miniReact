@@ -1,6 +1,10 @@
 import { Govneact } from "./govneact/govneact.js";
 
-Govneact.render(
-  Govneact.createElement("div", null, "Хеллоу мазафака бич"),
-  document.getElementById("root")
+const element = Govneact.createElement(
+  "div",
+  { id: "test" },
+  "Hello, world!",
+  Govneact.createElement("p", null, "This is a test.")
 );
+
+Govneact.render(element, document.getElementById("root"));
