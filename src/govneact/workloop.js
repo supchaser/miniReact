@@ -25,6 +25,9 @@ export function workloop(deadline) {
   requestIdleCallback(workloop);
 }
 
+// 1. Добавление элемента в DOM
+// 2. Создание волокон для потомков элемента
+// 3. Выбор следующей единицы работы
 function performUnintOfWork(nextUnitOfWork) {
   // TODO
 }
