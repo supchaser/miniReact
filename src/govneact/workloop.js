@@ -1,3 +1,5 @@
+import { createNode } from "./render";
+
 // единица обработки
 let nextUnitOfWork = null;
 
@@ -25,9 +27,53 @@ export function workloop(deadline) {
   requestIdleCallback(workloop);
 }
 
-// 1. Добавление элемента в DOM
-// 2. Создание волокон для потомков элемента
-// 3. Выбор следующей единицы работы
-function performUnintOfWork(nextUnitOfWork) {
-  // TODO
+// 1. Создать новый узел и добавить его в DOM
+// 2. Для каждого потомка создаем волокно
+// 3. Добавить в Fiber Tree новое волкно либо как child, либо как sibling
+// 4. Выбрать следующую единицу работы
+function performUnintOfWork(fiber) {
+  if (!fiber.node) {
+    fiber.node = createNode(fiber);
+  }
+
+  if (fiber.parent) {
+    fiber.parent.node.append(fiber.node);
+  }
+
+  let index = 0;
+  let prevSibling = null;
+  const elements = fiber.props.children;
+
+  while (index < elements.length) {
+    const element = elements[index];
+
+    const newFiber = {
+      type: element.type,
+      props: element.props,
+      parent: fiber,
+      node: null,
+    };
+
+    if (index === 0) {
+      fiber.child = newFiber;
+    } else {
+      prevSibling.sibling = newFiber;
+    }
+
+    index++;
+    prevSibling = newFiber;
+  }
+
+  if (fiber.child) {
+    return fiber.child;
+  }
+
+  let nextFiber = fiber;
+  while (nextFiber) {
+    if (nextFiber.sibling) {
+      return nextFiber.sibling;
+    }
+
+    nextFiber = nextFiber.parent;
+  }
 }

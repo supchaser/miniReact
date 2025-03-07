@@ -1,6 +1,6 @@
 // 1. Создаем новый узел на основе типа (div, span, p, h1 и др.) элемента и не забываем проверку на TEXT_ELEMENT
 // 2. Присваиваем узлы пропсы элемента
-function createNode(fiber) {
+export function createNode(fiber) {
   const node =
     fiber.type == "TEXT_ELEMENT"
       ? document.createTextNode("")
