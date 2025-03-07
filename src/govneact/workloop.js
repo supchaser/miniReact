@@ -2,6 +2,7 @@ import { createNode } from "./render";
 
 // единица обработки
 let nextUnitOfWork = null;
+let workingRoot = null;
 
 // подстраховка на случай отсутсвия RequestIdleCallback
 window.requestIdleCallback =
@@ -19,25 +20,28 @@ window.requestIdleCallback =
 
 // функция обратного вызова, запускается, когда основной поток свободен от выполнения других задач\
 // (период простоя или режим ожидания браузера)
-export function workloop(deadline) {
+export function workLoop(deadline) {
   while (nextUnitOfWork && deadline.timeRemaining()) {
     nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
   }
 
-  requestIdleCallback(workloop);
+  // добавляем fiber tree в DOM
+  if (!nextUnitOfWork && workingRoot) {
+    requestAnimationFrame(commitRoot);
+  }
+
+  requestIdleCallback(workLoop);
 }
+
+requestIdleCallback(workLoop);
 
 // 1. Создать новый узел и добавить его в DOM
 // 2. Для каждого потомка создаем волокно
 // 3. Добавить в Fiber Tree новое волкно либо как child, либо как sibling
 // 4. Выбрать следующую единицу работы
-function performUnintOfWork(fiber) {
+function performUnitOfWork(fiber) {
   if (!fiber.node) {
     fiber.node = createNode(fiber);
-  }
-
-  if (fiber.parent) {
-    fiber.parent.node.append(fiber.node);
   }
 
   let index = 0;
@@ -76,4 +80,17 @@ function performUnintOfWork(fiber) {
 
     nextFiber = nextFiber.parent;
   }
+
+  return null;
+}
+
+export function render(element, container) {
+  workingRoot = {
+    node: container,
+    props: {
+      children: [element],
+    },
+  };
+
+  nextUnitOfWork = workingRoot;
 }

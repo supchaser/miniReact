@@ -11,7 +11,3 @@ export function createNode(fiber) {
     .filter(isProperty)
     .forEach((key) => (node[key] = fiber.props[key]));
 }
-
-export function render(element, container) {
-  // TODO
-}
