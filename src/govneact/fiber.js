@@ -4,13 +4,14 @@ import {
   setWorkingRoot,
   workingRoot,
   nodesToRemove,
-  currentRoot,
-  setNextUnitOfWork,
-  setNodesToRemove,
 } from "./schedule.js";
 
-let workingFiber = null;
-let hookIndex = 0;
+export let workingFiber = null;
+export let hookIndex = 0;
+
+export function incrementHookIndex() {
+  hookIndex++;
+}
 
 // 1. Создать новый узел и добавить его в DOM
 // 2. Для каждого потомка создаем волокно
@@ -161,45 +162,4 @@ export function createNewFiber(workingFiber, elements) {
     prevSibling = newFiber;
     index++;
   }
-}
-
-export function useState(initialState) {
-  const oldHook =
-    workingFiber.alternate &&
-    workingFiber.alternate.hooks &&
-    workingFiber.alternate.hooks[hookIndex];
-
-  const hook = {
-    state: oldHook
-      ? oldHook.state
-      : initialState instanceof Function
-      ? initialState()
-      : initialState,
-    queue: [],
-  };
-
-  const actions = oldHook ? oldHook.queue : [];
-  actions.forEach((action) => {
-    hook.state = action instanceof Function ? action(hook.state) : action;
-  });
-
-  const setState = (action) => {
-    hook.queue.push(action);
-
-    const workingRoot = {
-      node: currentRoot.node,
-      props: currentRoot.props,
-      alternate: currentRoot,
-    };
-
-    setWorkingRoot(workingRoot);
-
-    setNextUnitOfWork(workingRoot);
-    setNodesToRemove();
-  };
-
-  workingFiber.hooks.push(hook);
-  hookIndex++;
-
-  return [hook.state, setState];
 }

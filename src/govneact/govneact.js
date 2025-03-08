@@ -1,6 +1,6 @@
 import { createElement } from "./createElement.js";
 import { currentRoot, scheduleNextWork } from "./schedule.js";
-import { useState } from "./fiber.js";
+import { useState } from "./hooks.js";
 
 function render(element, container) {
   const workingRoot = {
