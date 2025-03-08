@@ -1,10 +1,15 @@
-import { Govneact } from "./govneact/govneact.js";
+import Govneact from "./govneact/govneact.js";
 
-const element = Govneact.createElement(
-  "div",
-  { id: "test" },
-  "Hello, world!",
-  Govneact.createElement("p", null, "This is a test.")
+function App() {
+  return Govneact.createElement(
+    "div",
+    null,
+    "Hello from splitted Govneact!",
+    Govneact.createElement("p", null, "It works")
+  );
+}
+
+Govneact.render(
+  Govneact.createElement(App, null),
+  document.getElementById("root")
 );
-
-Govneact.render(element, document.getElementById("root"));
