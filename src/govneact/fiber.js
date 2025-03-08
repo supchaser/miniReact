@@ -4,6 +4,9 @@ import {
   setWorkingRoot,
   workingRoot,
   nodesToRemove,
+  currentRoot,
+  setNextUnitOfWork,
+  setNodesToRemove,
 } from "./schedule.js";
 
 let workingFiber = null;
@@ -25,10 +28,6 @@ export function performUnitOfWork(fiber) {
     fiber.node = createNode(fiber);
   }
 
-  const elements = fiber.props.children;
-
-  createNewFiber(fiber, elements);
-
   if (fiber.child) {
     return fiber.child;
   }
@@ -49,7 +48,8 @@ function updateFunctionalComponent(fiber) {
   workingFiber = fiber;
   hookIndex = 0;
   workingFiber.hooks = [];
-  const children = [fiber.type(fiber.props)];
+  const childElement = fiber.type(fiber.props);
+  const children = [childElement];
   createNewFiber(fiber, children);
 }
 
@@ -98,6 +98,8 @@ function commitWork(fiber) {
 }
 
 function commitRemove(fiber) {
+  console.warn("commitRemove:", fiber.type, fiber);
+
   if (fiber.node) {
     return fiber.node.remove();
   }
@@ -110,7 +112,7 @@ export function createNewFiber(workingFiber, elements) {
   let oldFiber = workingFiber.alternate && workingFiber.alternate.child;
   let prevSibling = null;
 
-  while (index < elements.length || oldFiber !== null) {
+  while (index < elements.length || oldFiber != null) {
     const element = elements[index];
     let newFiber = null;
 
@@ -145,14 +147,15 @@ export function createNewFiber(workingFiber, elements) {
       oldFiber.action = "DELETE";
       nodesToRemove.push(oldFiber);
     }
-    if (index === 0) {
-      workingFiber.child = newFiber;
-    } else {
-      prevSibling.sibling = newFiber;
-    }
 
     if (oldFiber) {
       oldFiber = oldFiber.sibling;
+    }
+
+    if (index === 0) {
+      workingFiber.child = newFiber;
+    } else if (element) {
+      prevSibling.sibling = newFiber;
     }
 
     prevSibling = newFiber;
@@ -183,14 +186,16 @@ export function useState(initialState) {
   const setState = (action) => {
     hook.queue.push(action);
 
-    workingRoot = {
+    const workingRoot = {
       node: currentRoot.node,
       props: currentRoot.props,
       alternate: currentRoot,
     };
 
-    nextUnitOfWork = workingRoot;
-    nodesToRemove = [];
+    setWorkingRoot(workingRoot);
+
+    setNextUnitOfWork(workingRoot);
+    setNodesToRemove();
   };
 
   workingFiber.hooks.push(hook);

@@ -1,11 +1,28 @@
 import Govneact from "./govneact/govneact.js";
 
+function Counter() {
+  const [count, setCount] = Govneact.useState(0);
+
+  return Govneact.createElement(
+    "div",
+    null,
+    Govneact.createElement("h2", null, `Count: ${count}`),
+    Govneact.createElement(
+      "button",
+      {
+        onClick: () => setCount((prev) => prev + 1),
+      },
+      "Increment"
+    )
+  );
+}
+
 function App() {
   return Govneact.createElement(
     "div",
     null,
-    "Hello from splitted Govneact!",
-    Govneact.createElement("p", null, "It works")
+    "Test of useState",
+    Govneact.createElement(Counter, null)
   );
 }
 

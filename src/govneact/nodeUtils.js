@@ -15,7 +15,7 @@ const wasDeleted = (prev, next) => (key) => !(key in next);
 export function createNode(fiber) {
   const node =
     fiber.type == "TEXT_ELEMENT"
-      ? document.createTextNode("")
+      ? document.createTextNode(fiber.props.nodeValue)
       : document.createElement(fiber.type);
 
   updateNode(node, {}, fiber.props);

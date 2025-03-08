@@ -32,6 +32,14 @@ export function setWorkingRoot(newWorkingRoot) {
   workingRoot = newWorkingRoot;
 }
 
+export function setNextUnitOfWork(newNextUnitOfWork) {
+  nextUnitOfWork = newNextUnitOfWork;
+}
+
+export function setNodesToRemove() {
+  nodesToRemove = [];
+}
+
 // функция обратного вызова, запускается, когда основной поток свободен от выполнения других задач\
 // (период простоя или режим ожидания браузера)
 export function workLoop(deadline) {
